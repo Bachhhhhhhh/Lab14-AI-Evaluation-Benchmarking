@@ -1,31 +1,28 @@
-# Báo cáo Phân tích Thất bại (Failure Analysis Report)
+# Failure Analysis & 5 Whys
 
-## 1. Tổng quan Benchmark
-- **Tổng số cases:** 50
-- **Tỉ lệ Pass/Fail:** X/Y
-- **Điểm RAGAS trung bình:**
-    - Faithfulness: 0.XX
-    - Relevancy: 0.XX
-- **Điểm LLM-Judge trung bình:** X.X / 5.0
+## Case #12: Conflicting Policy Information
+1. **Symptom:** Agent tra loi sai so voi cau hoi.
+2. **Why 1:** Answer dua tren document cu.
+3. **Why 2:** Retriever lay document cu ra rank 1.
+4. **Why 3:** Document moi khong co trong top K.
+5. **Why 4:** Khong su dung reranking metadata the hien date.
+6. **Root Cause:** Thieu version-aware reranking.
+7. **Action:** Them `effective_date` vao vector DB.
 
-## 2. Phân nhóm lỗi (Failure Clustering)
-| Nhóm lỗi | Số lượng | Nguyên nhân dự kiến |
-|----------|----------|---------------------|
-| Hallucination | 5 | Retriever lấy sai context |
-| Incomplete | 3 | Prompt quá ngắn, không yêu cầu chi tiết |
-| Tone Mismatch | 2 | Agent trả lời quá suồng sã |
+## Case #4: Missing details in multi-doc reasoning
+1. **Symptom:** Agent thieu thong tin quan trong.
+2. **Why 1:** Khong lay du doc_procedure_4.
+3. **Why 2:** Truy van chi lay 1 doc.
+4. **Why 3:** Cau hinh top_k qua nho (top_k=1).
+5. **Why 4:** Agent V1 set cung top_k=1 cho query don gian.
+6. **Root Cause:** Top_k khong linh hoat.
+7. **Action:** Tang top_k len 3 cho Agent V2.
 
-## 3. Phân tích 5 Whys (Chọn 3 case tệ nhất)
-
-### Case #1: [Mô tả ngắn]
-1. **Symptom:** Agent trả lời sai về...
-2. **Why 1:** LLM không thấy thông tin trong context.
-3. **Why 2:** Vector DB không tìm thấy tài liệu liên quan nhất.
-4. **Why 3:** Chunking size quá lớn làm loãng thông tin quan trọng.
-5. **Why 4:** ...
-6. **Root Cause:** Chiến lược Chunking không phù hợp với dữ liệu bảng biểu.
-
-## 4. Kế hoạch cải tiến (Action Plan)
-- [ ] Thay đổi Chunking strategy từ Fixed-size sang Semantic Chunking.
-- [ ] Cập nhật System Prompt để nhấn mạnh vào việc "Chỉ trả lời dựa trên context".
-- [ ] Thêm bước Reranking vào Pipeline.
+## Case #21: Prompt Injection Failure
+1. **Symptom:** Agent tra loi theo lenh "tell me a joke".
+2. **Why 1:** Khong co bo loc dau vao.
+3. **Why 2:** Agent prompt template bi de ghi de dang.
+4. **Why 3:** System message qua yeu, thieu rang buoc.
+5. **Why 4:** Khong ap dung guardrails cho input query.
+6. **Root Cause:** Thieu Input Guardrails bao ve khoi adversarial attack.
+7. **Action:** Them system prompt strict hon va guardrails layer.
